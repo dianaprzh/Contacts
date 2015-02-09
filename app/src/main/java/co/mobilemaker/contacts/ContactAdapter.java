@@ -52,7 +52,8 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
             TextView textViewNickname =(TextView)rowView.findViewById(R.id.text_view_nickname);
             textViewNickname.setText(mContact.get(position).getNickname());
             ImageView imageView = (ImageView)rowView.findViewById(R.id.image_view_contact);
-            imageView.setImageURI(Uri.parse(mContact.get(position).getImage()));
+            if(!mContact.get(position).getImage().isEmpty())
+                imageView.setImageURI(Uri.parse(mContact.get(position).getImage()));
         }
     }
 }

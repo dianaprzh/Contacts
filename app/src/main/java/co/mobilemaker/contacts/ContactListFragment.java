@@ -9,6 +9,8 @@ import android.support.v4.app.ListFragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
@@ -42,6 +44,12 @@ public class ContactListFragment extends ListFragment {
         List<Contact> contacts = new ArrayList<>();
         mAdapter = new ContactAdapter(getActivity(),contacts);
         setListAdapter(mAdapter);
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Contact contact = (Contact) parent.getItemAtPosition(position);
+            }
+        });
     }
 
     @Override

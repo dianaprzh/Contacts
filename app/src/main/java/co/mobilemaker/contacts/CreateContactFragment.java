@@ -82,7 +82,10 @@ public class CreateContactFragment extends Fragment {
         Contact contact = new Contact();
         contact.setName(name);
         contact.setNickname(mEditTextNickname.getText().toString());
-        contact.setImage(mImageUri.toString());
+        if(mImageUri != null)
+            contact.setImage(mImageUri.toString());
+        else
+            contact.setImage("");
         try {
             Dao<Contact,Integer> dao = getDBHelper().getDocumentDao();
             dao.create(contact);
@@ -96,7 +99,10 @@ public class CreateContactFragment extends Fragment {
         Intent intent = new Intent();
         intent.putExtra(NAME,name);
         intent.putExtra(NICKNAME,mEditTextNickname.getText().toString());
-        intent.putExtra(IMAGE,mImageUri.toString());
+        if(mImageUri != null)
+            intent.putExtra(IMAGE,mImageUri.toString());
+        else
+            intent.putExtra(IMAGE,"");
         activity.setResult(Activity.RESULT_OK, intent);
     }
 

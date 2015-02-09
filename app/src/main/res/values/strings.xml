@@ -10,5 +10,6 @@
     <string name="edit_text_last_name_hint">Last name</string>
     <string name="edit_text_nickname_hint">Nickname</string>
     <string name="button_done">Done</string>
+    <string name="title_activity_edit_contact">EditContactActivity</string>
 
 </resources>
