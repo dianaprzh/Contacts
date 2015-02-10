@@ -16,10 +16,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -27,10 +27,12 @@ import java.sql.SQLException;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class CreateContactFragment extends Fragment {
+public class ContactEditorFragment extends Fragment {
 
-    private final static String LOG_TAG = CreateContactFragment.class.getSimpleName();
+    private final static String LOG_TAG = ContactEditorFragment.class.getSimpleName();
     private final static Integer REQUEST_CODE = 1;
+    private final static String IMAGE_FILENAME = "image.jpg";
+    final static Integer RESULT_DELETE = 3;
     final static String NAME = "NAME";
     final static String NICKNAME = "NICKNAME";
     final static String IMAGE = "IMAGE";
@@ -38,13 +40,15 @@ public class CreateContactFragment extends Fragment {
     EditText mEditTextLastName;
     EditText mEditTextNickname;
     ImageButton mImageButton;
+    Button mButtonDone;
+    Button mButtonDelete;
     Uri mImageUri;
     DataBaseHelper mDBHelper = null;
-    public String mImageFileName = "image.jpg";
 
 
 
-    public CreateContactFragment() {
+
+    public ContactEditorFragment() {
     }
 
     public DataBaseHelper getDBHelper(){
@@ -57,43 +61,42 @@ public class CreateContactFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_create_contact, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_contact_editor, container, false);
         wireUp(rootView);
+        int action = (int)getActivity().getIntent().getExtras().get(ContactListFragment.ACTION);
+        if(action == ContactListFragment.REQUEST_CODE_CREATE)
+            mButtonDelete.setVisibility(View.GONE);
+        else if(action == ContactListFragment.REQUEST_CODE_EDIT)
+            mButtonDone.setText("UPDATE");
         prepareDoneButton(rootView);
+        prepareDeleteButton(rootView);
         return rootView;
     }
 
+    private void prepareDeleteButton(View rootView) {
+        mButtonDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Activity activity = getActivity();
+                activity.setResult(RESULT_DELETE,new Intent());
+                activity.finish();
+            }
+        });
+    }
+
     private void prepareDoneButton(View rootView) {
-        Button button = (Button)rootView.findViewById(R.id.button_done);
-        button.setOnClickListener(new View.OnClickListener() {
+        mButtonDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Activity activity = getActivity();
                 String name = mEditTextFirstName.getText().toString() + " " +
                         mEditTextLastName.getText().toString();
-                saveContact(name);
                 createIntent(activity, name);
                 activity.finish();
             }
         });
     }
 
-    private void saveContact(String name) {
-        Contact contact = new Contact();
-        contact.setName(name);
-        contact.setNickname(mEditTextNickname.getText().toString());
-        if(mImageUri != null)
-            contact.setImage(mImageUri.toString());
-        else
-            contact.setImage("");
-        try {
-            Dao<Contact,Integer> dao = getDBHelper().getDocumentDao();
-            dao.create(contact);
-        }   catch(SQLException e){
-            Log.e(LOG_TAG, "Failed to create DAO", e);
-
-        }
-    }
 
     private void createIntent(Activity activity, String name) {
         Intent intent = new Intent();
@@ -102,7 +105,7 @@ public class CreateContactFragment extends Fragment {
         if(mImageUri != null)
             intent.putExtra(IMAGE,mImageUri.toString());
         else
-            intent.putExtra(IMAGE,"");
+            intent.putExtra(IMAGE, "");
         activity.setResult(Activity.RESULT_OK, intent);
     }
 
@@ -110,6 +113,8 @@ public class CreateContactFragment extends Fragment {
         mEditTextFirstName = (EditText)rootView.findViewById(R.id.edit_text_first_name);
         mEditTextLastName = (EditText)rootView.findViewById(R.id.edit_text_last_name);
         mEditTextNickname = (EditText)rootView.findViewById(R.id.edit_text_nickname);
+        mButtonDone = (Button)rootView.findViewById(R.id.button_done);
+        mButtonDelete = (Button)rootView.findViewById(R.id.button_delete);
         mImageButton = (ImageButton)rootView.findViewById(R.id.image_button_place_holder);
         prepareImageButton();
     }
@@ -119,7 +124,7 @@ public class CreateContactFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT,getImageFileUri(mImageFileName));
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,getImageFileUri(IMAGE_FILENAME));
                 startActivityForResult(intent, REQUEST_CODE);
             }
         });
@@ -136,10 +141,12 @@ public class CreateContactFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == getActivity().RESULT_OK && requestCode == REQUEST_CODE) {
-            mImageUri = getImageFileUri(mImageFileName);
-            Bitmap bitmap = BitmapFactory.decodeFile(mImageUri.getPath());
-            mImageButton.setImageBitmap(bitmap);
+        if (resultCode == getActivity().RESULT_OK){
+            if(requestCode == REQUEST_CODE) {
+                mImageUri = getImageFileUri(IMAGE_FILENAME);
+                Bitmap bitmap = BitmapFactory.decodeFile(mImageUri.getPath());
+                mImageButton.setImageBitmap(bitmap);
+            }
         }
     }
 

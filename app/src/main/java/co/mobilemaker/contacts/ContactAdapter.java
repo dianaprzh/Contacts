@@ -10,6 +10,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.j256.ormlite.dao.Dao;
+
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -19,11 +22,46 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
 
     Context mContext;
     List<Contact> mContact;
+    DataBaseHelper mDBHelper;
 
-    public ContactAdapter(Context context, List<Contact> contact){
+    public ContactAdapter(Context context, DataBaseHelper dbHelper, List<Contact> contact){
         super(context, R.layout.list_item_contact_list, contact);
         mContext = context;
+        mDBHelper = dbHelper;
         mContact = contact;
+    }
+
+    @Override
+    public void add(Contact contact) {
+        super.add(contact);
+        try {
+            Dao<Contact, Integer> contactDao = mDBHelper.getDocumentDao();
+            contactDao.create(contact);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void insert(Contact contact, int index) {
+        super.insert(contact, index);
+        try {
+            Dao<Contact, Integer> contactDao = mDBHelper.getDocumentDao();
+            contactDao.create(contact);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void remove(Contact contact) {
+        super.remove(contact);
+        try {
+            Dao<Contact, Integer> contactDao = mDBHelper.getDocumentDao();
+            contactDao.delete(contact);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -52,7 +90,7 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
             TextView textViewNickname =(TextView)rowView.findViewById(R.id.text_view_nickname);
             textViewNickname.setText(mContact.get(position).getNickname());
             ImageView imageView = (ImageView)rowView.findViewById(R.id.image_view_contact);
-            if(!mContact.get(position).getImage().isEmpty())
+            if(mContact.get(position).getImage() != null && !mContact.get(position).getImage().isEmpty())
                 imageView.setImageURI(Uri.parse(mContact.get(position).getImage()));
         }
     }

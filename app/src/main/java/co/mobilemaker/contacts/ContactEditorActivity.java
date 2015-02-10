@@ -6,15 +6,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class CreateContactActivity extends ActionBarActivity {
+public class ContactEditorActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_contact);
+        setContentView(R.layout.activity_contact_editor);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new CreateContactFragment())
+                    .add(R.id.container, new ContactEditorFragment())
                     .commit();
         }
     }
@@ -23,7 +23,7 @@ public class CreateContactActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_create_contact, menu);
+        getMenuInflater().inflate(R.menu.menu_contact_editor, menu);
         return true;
     }
 
